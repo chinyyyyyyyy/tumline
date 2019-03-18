@@ -1,0 +1,11 @@
+doctype html
+html(lang="en")
+  head
+    link(href="stylesheets/style.css", rel='stylesheet')
+  body
+    a(href='/logout') logout
+    each row in chatlog
+        p #{row.User} : #{row.Text}
+    form(name="sendMessage",method="post",action="/sendMessage")
+      input(type='text', name='message',placeholder='Message')
+      button(type='submit') Send
