@@ -114,6 +114,19 @@ router.get('/chatroom/:id',function(req,res){
   });
 })
 
+router.post('/destroy',function(req,res){
+  var grouplsit = req.grouplist;
+  grouplsit.findOneAndDelete({_id:req.body.chatroomid},function (err,docs){
+    if (!err) {
+      console.log('notification!');
+    }
+    else {
+      console.log(err);
+    }
+  res.redirect('/chat');
+  });
+});
+
 
 
 module.exports = router;
