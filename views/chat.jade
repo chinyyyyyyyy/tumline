@@ -17,7 +17,11 @@ html(lang="en")
     each row in roomlist
         .row
           a(href=`/chatroom/${row._id}` class="btn btn-info" role="button") #{row.group_name} 
-          a(href="#" class="btn btn-warning" role="button") Leaves
-          a(href="#" class="btn btn-danger" role="button") Destroy!!
+          form(name="leaves",method="post",action="/leaves")
+            input(type='hidden', name='chatroomid', value=row._id)
+            button(type="submit" class="btn btn-warning" role="button") Leaves
+          form(name="destroy",method="post",action="/destroy")
+            input(type='hidden', name='chatroomid', value=row._id)
+            button(type="submit" class="btn btn-danger" role="button") Destroy!!
     p
     a(href="/logout" class="btn btn-warning" role="button") Logout
