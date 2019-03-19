@@ -18,7 +18,10 @@ html(lang="en")
         .row
           a(href=`/chatroom/${row._id}` class="btn btn-info" role="button") #{row.group_name} 
           a(href="#" class="btn btn-warning" role="button") Leaves
-          a(href="#" class="btn btn-danger" role="button") Destroy!!
+          form(name="sendMessage",method="post",action="/sendMessage")
+             input(type='hidden', name='chatroomid', value=thischat._id)
+             button(type='submit',class="btn btn-danger" ) Destroy!!
+
     h2
     a(href="/logout" class="btn btn-warning" role="button") Logout
     h2 =====================================================================
