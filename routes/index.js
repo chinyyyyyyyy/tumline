@@ -6,6 +6,10 @@ var express               = require('express'),
     User                  = require('./users');
 /*===================================== Authentication Page ================================================ */
 
+router.get('/',function(req,res,next){
+  res.render('login');
+});
+
 router.get('/login',function(req,res,next){
   res.render('login');
 });
@@ -32,13 +36,21 @@ router.post('/regis',function(req,res){
 });
 
 router.post('/sendMessage',function(req,res){
-  console.log(req.user);
-  var Chat = req.chat;
-  var transaction = new Chat({User:req.user.username,Text:req.body.message});
-  transaction.save(function (err, fluffy) {
-    if (err) return console.error(err);
-  });
-  res.redirect('/chat');
+  var grouplist = req.grouplist;
+  var chatlog = req.chat;
+  var transaction = new chatlog({User:req.user.username,Text:req.body.message});
+  console.log(transaction)
+  grouplist.findOneAndUpdate(
+    { _id:req.body.chatroomid}, 
+    { $push: { group_chat: transaction } },
+   function (error, success) {
+         if (error) {
+             console.log(error);
+         } else {
+             console.log(success);
+         }
+    });
+  res.redirect('/chatroom/'+req.body.chatroomid);
 
 });
 
@@ -47,16 +59,61 @@ router.get('/logout',function(req,res){
   res.redirect('login');
 });
 
-
+/*===================================== Chat ================================================ */
 router.get('/chat',function(req,res){
-  var userid = req.userdb;
-  userid.find({}, function (e, docs) {
-    console.log(docs)
-  });
-  var Chat = req.chat;
-  Chat.find({}, function (e, docs) {
-    res.render('chat', { "chatlog": docs });
+  var grouplist = req.grouplist;
+  grouplist.find({ group_member:req.user.username}, function (e, docs) {
+    res.render('chat',{"roomlist":docs});
   });
 });
+
+router.post('/addgroup',function(req,res){
+  var grouplist = req.grouplist;
+  var newgroup = new grouplist({
+    group_name: req.body.groupname,
+    group_member: [req.user.username],
+    group_chat: {}
+  });
+  newgroup.save(function (err) {
+    if (err) return console.error(err);
+  });
+  res.redirect('/chat');
+});
+
+router.post('/join',function(req,res){
+  var grouplist = req.grouplist;
+  grouplist.findOne({ group_name:req.body.findgroupname}, function (e, docs) {
+    if(docs == null){
+      console.log('no group available');
+    }else{
+      grouplist.findOneAndUpdate(
+        { group_name:req.body.findgroupname }, 
+        { $push: { group_member: req.user.username  } },
+       function (error, success) {
+             if (error) {
+                 console.log(error);
+             } else {
+                 console.log(success);
+             }
+        });
+    }
+  });
+  res.redirect('/chat');
+});
+
+router.get('/chatroom/:id',function(req,res){
+  var grouplist = req.grouplist;
+  grouplist.find({ group_member:req.user.username}, function (e, docs) {
+    for(var i in docs){
+      if(docs[i]._id == req.params.id){
+        var thischat = docs[i];
+        console.log(thischat);
+      }
+    }
+    res.render('chatroom',{"roomlist":docs,"thischat":thischat});
+  });
+})
+
+
 
 module.exports = router;

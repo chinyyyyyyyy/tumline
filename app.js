@@ -29,6 +29,15 @@ var Chat = new db.Schema({
   Text: String,
 });
 
+var grouplist = new db.Schema({
+  group_name: String,
+  group_member: [String],
+  group_chat: [{
+    User: String,
+    Text: String,
+  }]
+});
+
 var Userdb = new db.Schema({
   username: String,
 });
@@ -46,7 +55,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req,res,next){
   req.db = db;
   req.chat = db.model('chat',Chat);
-  req.userdb = db.model('users',Userdb)
+  req.userdb = db.model('users',Userdb);
+  req.grouplist = db.model('grouplist',grouplist);
   next();
 }); 
  
