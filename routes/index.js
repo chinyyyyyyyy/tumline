@@ -114,7 +114,33 @@ router.get('/chatroom/:id',function(req,res){
   });
 })
 
+router.post('/destroy',function(req,res){
+  var grouplsit = req.grouplist;
+  grouplsit.findOneAndDelete({_id:req.body.chatroomid},function (err,docs){
+    if (!err) {
+      console.log('notification!');
+    }
+    else {
+      console.log(err);
+    }
+  res.redirect('/chat');
+  });
+});
 
+router.post('/leaves',function(req,res){
+  var grouplist = req.grouplist;
+  grouplist.findOneAndUpdate(
+    { _id:req.body.chatroomid }, 
+    { $pull: { group_member: req.user.username  } },
+   function (error, success) {
+         if (error) {
+             console.log(error);
+         } else {
+             console.log("success");
+         }
+    });
+  res.redirect('/chat');
+});
 
 
 
