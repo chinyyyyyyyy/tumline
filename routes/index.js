@@ -127,6 +127,19 @@ router.post('/destroy',function(req,res){
   });
 });
 
-
+router.post('/leaves',function(req,res){
+  var grouplist = req.grouplist;
+  grouplist.findOneAndUpdate(
+    { _id:req.body.chatroomid }, 
+    { $pull: { group_member: req.user.username  } },
+   function (error, success) {
+         if (error) {
+             console.log(error);
+         } else {
+             console.log("success");
+         }
+    });
+  res.redirect('/chat');
+});
 
 module.exports = router;
