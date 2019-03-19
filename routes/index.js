@@ -49,6 +49,10 @@ router.get('/logout',function(req,res){
 
 
 router.get('/chat',function(req,res){
+  var userid = req.userdb;
+  userid.find({}, function (e, docs) {
+    console.log(docs)
+  });
   var Chat = req.chat;
   Chat.find({}, function (e, docs) {
     res.render('chat', { "chatlog": docs });

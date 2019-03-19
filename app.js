@@ -29,6 +29,10 @@ var Chat = new db.Schema({
   Text: String,
 });
 
+var Userdb = new db.Schema({
+  username: String,
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -42,6 +46,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(function(req,res,next){
   req.db = db;
   req.chat = db.model('chat',Chat);
+  req.userdb = db.model('users',Userdb)
   next();
 }); 
  
