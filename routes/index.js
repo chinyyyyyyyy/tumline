@@ -93,7 +93,6 @@ router.post('/addgroup',function(req,res){
 router.post('/join',function(req,res){
   var grouplist = req.grouplist;
   grouplist.findOne({ group_name:req.body.findgroupname}, function (e, docs) {
-    console.log(docs.group_member.includes(req.user.username));
     if(docs == null){
       console.log('no group available');
     }else if (!(docs.group_member.includes(req.user.username))) {
