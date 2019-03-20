@@ -7,6 +7,14 @@ var express               = require('express'),
 
 /*===================================== Authentication Page ================================================ */
 
+function isLoggedIn(req, res, next){
+  if(req.isAuthenticated()){
+    return next();
+  } else {
+    res.redirect("/login");
+  }
+}
+
 router.get('/',function(req,res,next){
   res.render('login');
 });
@@ -61,7 +69,10 @@ router.get('/logout',function(req,res){
 });
 
 /*===================================== Chat ================================================ */
-router.get('/chat',function(req,res){
+router.get('/chat',isLoggedIn,function(req,res){
+  if (req.user.username == null){
+    res.redirect('/login');
+  }
   var grouplist = req.grouplist;
   grouplist.find({ group_member:req.user.username}, function (e, docs) {
     res.render('chat',{"roomlist":docs});
@@ -111,7 +122,10 @@ router.post('/join',function(req,res){
   res.redirect('/chat');
 });
 
-router.get('/chatroom/:id',function(req,res){
+router.get('/chatroom/:id',isLoggedIn,function(req,res){
+  if (req.user.username == null){
+    res.redirect('/login');
+  }
   var grouplist = req.grouplist;
   grouplist.find({ group_member:req.user.username}, function (e, docs) {
     for(var i in docs){

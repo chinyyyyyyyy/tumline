@@ -81,16 +81,16 @@ app.use(function(err, req, res, next) {
 });
 
 app.use(function(req,res,next){
-  res.locals.currentUser = req.user;
-  next();
-});
-
-app.listen(3000, function(){
-  console.log('app listening on port 3000 for project 1 !');
-});
-
-// app.listen(3001, function(){
-//   console.log('app listening on port 3001 for project 2 !');
+    res.locals.currentUser = req.user;
+    next();
+  });
+  
+// app.listen(3000, function(){
+//   console.log('app listening on port 3000 for project 1 !');
 // });
+
+app.listen(3001, function(){
+  console.log('app listening on port 3001 for project 2 !');
+});
 
 module.exports = app;
