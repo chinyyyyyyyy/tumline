@@ -4,6 +4,7 @@ var express               = require('express'),
     LocalStrategy         = require('passport-local'),
     passportLocalMongoose = require('passport-local-mongoose'),
     User                  = require('./users');
+
 /*===================================== Authentication Page ================================================ */
 
 router.get('/',function(req,res,next){
@@ -92,9 +93,10 @@ router.post('/addgroup',function(req,res){
 router.post('/join',function(req,res){
   var grouplist = req.grouplist;
   grouplist.findOne({ group_name:req.body.findgroupname}, function (e, docs) {
+    console.log(docs.group_member.includes(req.user.username));
     if(docs == null){
       console.log('no group available');
-    }else{
+    }else if (!(docs.group_member.includes(req.user.username))) {
       grouplist.findOneAndUpdate(
         { group_name:req.body.findgroupname }, 
         { $push: { group_member: req.user.username  } },
@@ -150,7 +152,5 @@ router.post('/leaves',function(req,res){
     });
   res.redirect('/chat');
 });
-
-
 
 module.exports = router;
