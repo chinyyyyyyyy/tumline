@@ -69,13 +69,22 @@ router.get('/chat',function(req,res){
 
 router.post('/addgroup',function(req,res){
   var grouplist = req.grouplist;
-  var newgroup = new grouplist({
-    group_name: req.body.groupname,
-    group_member: [req.user.username],
-    group_chat: {}
-  });
-  newgroup.save(function (err) {
-    if (err) return console.error(err);
+  grouplist.findOne({group_name:req.body.groupname}, function (e,docs){
+    if(docs != null){
+      console.log('Groupname is already used');
+    } else if (req.body.groupname==''){
+      console.log('Blank Input');
+    } else {
+      console.log('Creating Group');
+      var newgroup = new grouplist({
+        group_name: req.body.groupname,
+        group_member: [req.user.username],
+        group_chat: {}
+      });
+      newgroup.save(function (err) {
+        if (err) return console.error(err);
+      });
+    }
   });
   res.redirect('/chat');
 });
