@@ -60,6 +60,10 @@ app.use(function(req,res,next){
   next();
 }); 
  
+app.use(function(req,res,next){
+  res.locals.currentUser = req.user;
+  next();
+});
 
 app.use('/', indexRouter);
 //app.use('/users', usersRouter);
@@ -80,11 +84,6 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.use(function(req,res,next){
-    res.locals.currentUser = req.user;
-    next();
-  });
-  
 // app.listen(3000, function(){
 //   console.log('app listening on port 3000 for project 1 !');
 // });

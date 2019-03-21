@@ -24,7 +24,7 @@ router.get('/login',function(req,res,next){
 });
 
 router.post('/login',passport.authenticate("local",{
-      successRedirect: "/chat",
+      successRedirect: "/chatroom/home",
       failureRedirect: "/login"
 }),function(req,res,next){
 });
@@ -69,15 +69,6 @@ router.get('/logout',function(req,res){
 });
 
 /*===================================== Chat ================================================ */
-router.get('/chat',isLoggedIn,function(req,res){
-  if (req.user.username == null){
-    res.redirect('/login');
-  }
-  var grouplist = req.grouplist;
-  grouplist.find({ group_member:req.user.username}, function (e, docs) {
-    res.render('chat',{"roomlist":docs});
-  });
-});
 
 router.post('/addgroup',function(req,res){
   var grouplist = req.grouplist;
@@ -98,7 +89,7 @@ router.post('/addgroup',function(req,res){
       });
     }
   });
-  res.redirect('/chat');
+  res.redirect('/chatroom/home');
 });
 
 router.post('/join',function(req,res){
@@ -119,22 +110,25 @@ router.post('/join',function(req,res){
         });
     }
   });
-  res.redirect('/chat');
+  res.redirect('/chatroom/home');
 });
 
 router.get('/chatroom/:id',isLoggedIn,function(req,res){
-  if (req.user.username == null){
-    res.redirect('/login');
-  }
   var grouplist = req.grouplist;
+  console.log('kuy');
   grouplist.find({ group_member:req.user.username}, function (e, docs) {
-    for(var i in docs){
-      if(docs[i]._id == req.params.id){
-        var thischat = docs[i];
-        console.log(thischat);
+    if (req.params.id=="home"){
+      res.render('chat',{"roomlist":docs});
+    } else {
+      for(var i in docs){
+        if(docs[i]._id == req.params.id){
+          var thischat = docs[i];
+          console.log(thischat);
+        }
       }
+      res.render('chatroom',{"roomlist":docs,"thischat":thischat})
     }
-    res.render('chatroom',{"roomlist":docs,"thischat":thischat});
+    ;
   });
 })
 
@@ -147,7 +141,7 @@ router.post('/destroy',function(req,res){
     else {
       console.log(err);
     }
-  res.redirect('/chat');
+  res.redirect('/chatroom/home');
   });
 });
 
@@ -163,7 +157,7 @@ router.post('/leaves',function(req,res){
              console.log("success");
          }
     });
-  res.redirect('/chat');
+  res.redirect('/chatroom/home');
 });
 
 module.exports = router;

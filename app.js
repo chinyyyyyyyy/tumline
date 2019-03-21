@@ -61,6 +61,11 @@ app.use(function(req,res,next){
 }); 
  
 
+app.use(function(req,res,next){
+  res.locals.currentUser = req.user;
+  next();
+});
+
 app.use('/', indexRouter);
 //app.use('/users', usersRouter);
 
@@ -78,11 +83,6 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
-});
-
-app.use(function(req,res,next){
-  res.locals.currentUser = req.user;
-  next();
 });
 
 app.listen(3000, function(){
