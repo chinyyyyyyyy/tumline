@@ -64,7 +64,7 @@ function isLoggedIn(req, res, next){
     }
 }
   
-app.get(['/','login'],function(req,res,next){
+app.get(['/','/login'],function(req,res,next){
     res.render('login');
 });
 
@@ -152,6 +152,11 @@ app.post('/join',function(req,res){
     });
     res.redirect('/chatroom/home');
 });
+
+app.get('/serchandjoin',isLoggedIn,function(req,res){
+    res.render('');
+})
+
 
 app.get('/chatroom/:id',isLoggedIn,function(req,res){
     grouplist.find({ group_member:req.user.username}, function (e, docs) {
