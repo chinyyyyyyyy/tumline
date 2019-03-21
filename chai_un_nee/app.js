@@ -170,7 +170,7 @@ app.get('/chatroom/:id',isLoggedIn,function(req,res){
 })
 
 app.post('/destroy',function(req,res){
-    grouplsit.findOneAndDelete({_id:req.body.chatroomid},function (err,docs){
+    grouplist.findOneAndDelete({_id:req.body.chatroomid},function (err,docs){
         if (!err) {
         console.log('notification!');
         }
