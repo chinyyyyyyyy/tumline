@@ -1,0 +1,8 @@
+== To install package ==
+1 cmd npm install
+
+== To deploy the server ==
+1 open NGINX set default port to 80
+2 cmd1 node app.js (port 3000)
+3 cmd2 node app2.js (port 3001)
+4 open browser and open link localhost/
