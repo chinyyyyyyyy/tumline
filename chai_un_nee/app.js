@@ -2,8 +2,9 @@ var express               = require('express'),
     path                  = require('path'), 
     passport              = require('passport'),
     LocalStrategy         = require('passport-local'),
-    bodyParser = require('body-parser'),
-    User                  = require('./users');
+    bodyParser            = require('body-parser'),
+    User                  = require('./users'),
+    cookieParser          = require('cookie-parser');
 var app = express();
 var port = 3000;
 
@@ -44,6 +45,7 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade'); 
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 /*================================ Routing ===================================*/ 
 
@@ -51,7 +53,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //Authenticate
 app.get('/socket', function(req, res) {
     Chat.find({},function(err,docs){
-        console.log(docs);
         res.render('index',{'inichat':docs});
     });
 });
@@ -65,6 +66,7 @@ function isLoggedIn(req, res, next){
 }
   
 app.get(['/','/login'],function(req,res,next){
+    console.log('hello')
     res.render('login');
 });
 
@@ -91,6 +93,9 @@ app.post('/regis',function(req,res){
 });
 
 app.post('/sendMessage',function(req,res){
+    if (req.user == null && req.cookies.userData!='undefined'){
+        req.user = req.cookies.userData;
+    }
     var transaction = new Chat({User:req.user.username,Text:req.body.message});
     grouplist.findOneAndUpdate(
         { _id:req.body.chatroomid}, 
@@ -107,12 +112,16 @@ app.post('/sendMessage',function(req,res){
 
 app.get('/logout',function(req,res){
     req.logout();
+    res.clearCookie('userData');
     res.redirect('login');
 });
 
 /*===================================== Chat ================================================ */
 
 app.post('/addgroup',function(req,res){
+    if (req.user == null && req.cookies.userData!='undefined'){
+        req.user = req.cookies.userData;
+    }
     grouplist.findOne({group_name:req.body.groupname}, function (e,docs){
         if(docs != null){
         console.log('Groupname is already used');
@@ -136,6 +145,9 @@ app.post('/addgroup',function(req,res){
 });
 
 app.post('/join',function(req,res){
+    if (req.user == null && req.cookies.userData!='undefined'){
+        req.user = req.cookies.userData;
+    }
     grouplist.findOne({ group_name:req.body.findgroupname}, function (e, docs) {
         if(docs == null){
         console.log('no group available');
@@ -156,15 +168,21 @@ app.post('/join',function(req,res){
     });
 });
 
-app.get('/serchandjoin',isLoggedIn,function(req,res){
+app.get('/serchandjoin',function(req,res){
     res.render('search');
 })
 
-app.get('/addgroup',isLoggedIn,function(req,res){
+app.get('/addgroup',function(req,res){
     res.render('addgroup');
 })
 
-app.get('/chatroom/:id',isLoggedIn,function(req,res){
+app.get('/chatroom/:id',function(req,res){
+    if (req.user!=null){
+        res.cookie('userData',req.user);
+    }
+    if (req.user == null && req.cookies.userData!='undefined'){
+        req.user = req.cookies.userData;
+    }
     grouplist.find({ group_member:req.user.username}, function (e, docs) {
         if (req.params.id=="homepage"){
             res.render('chat',{"roomlist":docs,'clientname':req.user.username});
@@ -193,6 +211,9 @@ app.post('/destroy',function(req,res){
 });
 
 app.post('/leaves',function(req,res){
+    if (req.user == null && req.cookies.userData!='undefined'){
+        req.user = req.cookies.userData;
+    }
     grouplist.findOneAndUpdate(
         { _id:req.body.chatroomid }, 
         { $pull: { group_member: req.user.username  } },
