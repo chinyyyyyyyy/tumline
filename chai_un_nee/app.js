@@ -69,7 +69,7 @@ app.get(['/','/login'],function(req,res,next){
 });
 
 app.post('/login',passport.authenticate("local",{
-    successRedirect: "/chatroom/home",
+    successRedirect: "/chatroom/homepage",
     failureRedirect: "/login"
 }),function(req,res,next){
 });
@@ -116,8 +116,10 @@ app.post('/addgroup',function(req,res){
     grouplist.findOne({group_name:req.body.groupname}, function (e,docs){
         if(docs != null){
         console.log('Groupname is already used');
+        res.redirect('/addgroup');
         } else if (req.body.groupname==''){
         console.log('Blank Input');
+        res.redirect('/addgroup');
         } else {
         console.log('Creating Group');
         var newgroup = new grouplist({
@@ -128,15 +130,16 @@ app.post('/addgroup',function(req,res){
         newgroup.save(function (err) {
             if (err) return console.error(err);
         });
+        res.redirect('/chatroom/homepage');
         }
     });
-    res.redirect('/chatroom/home');
 });
 
 app.post('/join',function(req,res){
     grouplist.findOne({ group_name:req.body.findgroupname}, function (e, docs) {
         if(docs == null){
         console.log('no group available');
+        res.redirect('/serchandjoin');
         }else if (!(docs.group_member.includes(req.user.username))) {
         grouplist.findOneAndUpdate(
             { group_name:req.body.findgroupname }, 
@@ -148,20 +151,23 @@ app.post('/join',function(req,res){
                     console.log(success);
                 }
             });
+        res.redirect('/chatroom/homepage');
         }
     });
-    res.redirect('/chatroom/home');
 });
 
 app.get('/serchandjoin',isLoggedIn,function(req,res){
-    res.render('');
+    res.render('search');
 })
 
+app.get('/addgroup',isLoggedIn,function(req,res){
+    res.render('addgroup');
+})
 
 app.get('/chatroom/:id',isLoggedIn,function(req,res){
     grouplist.find({ group_member:req.user.username}, function (e, docs) {
-        if (req.params.id=="home"){
-            res.render('chat',{"roomlist":docs});
+        if (req.params.id=="homepage"){
+            res.render('chat',{"roomlist":docs,'clientname':req.user.username});
         } else {
             for(var i in docs){
                 if(docs[i]._id == req.params.id){
@@ -169,7 +175,7 @@ app.get('/chatroom/:id',isLoggedIn,function(req,res){
                 console.log(thischat);
                 }
             }
-            res.render('chatroom',{"roomlist":docs,"thischat":thischat});
+            res.render('chatroom',{"roomlist":docs,"thischat":thischat,'clientname':req.user.username});
         }
     });
 })
@@ -182,7 +188,7 @@ app.post('/destroy',function(req,res){
         else {
         console.log(err);
         }
-    res.redirect('/chatroom/home');
+    res.redirect('/chatroom/homepage');
     });
 });
 
@@ -197,7 +203,7 @@ app.post('/leaves',function(req,res){
                 console.log("success");
             }
         });
-    res.redirect('/chatroom/home');
+    res.redirect('/chatroom/homepage');
 });
 
 /*================================ SOCKET.IO ===================================*/ 
@@ -208,12 +214,19 @@ var io = require('socket.io').listen(server);
 
 io.on('connection', function(socket) {
     socket.on('chat', function(data) {
+        console.log(data);
         var name = data.username;
         var message = data.message;
         var transaction = new Chat({User: name, Text: message});
-        transaction.save(function(){
-            io.emit('chat',data);
-        });
+        grouplist.findOneAndUpdate(
+            { _id:data.chatroom}, 
+            { $push: { group_chat: transaction } },
+            function (error, success) {
+                if (error) {
+                    console.log(error);
+                }
+                io.emit('chat',data); 
+            });
     });
 });
 

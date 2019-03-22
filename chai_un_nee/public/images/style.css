@@ -41,7 +41,7 @@ body{
     padding-top : 5px;
 }
 
-.message-other{
+#message-other{
     padding: 10px 15px;
     margin-bottom: 5px;
     margin-top: 10px;
@@ -51,7 +51,7 @@ body{
     clear: both;
 }
 
-.message-my{
+#message-my{
     padding: 10px 15px;
     margin-bottom: 5px;
     margin-top: 10px;
@@ -127,15 +127,4 @@ h3{
     background-color: rgb(252, 255, 97);
     border-color: rgb(252, 255, 97,0.4);
     color: #000000;
-}
-
-.box {
-    width: 100%;
-    border-radius: 3px;
-}
-
-#chat-message {
-    background: #f5f5f5;
-    padding: 10px;
-    border: 1px solid #d5d5d5;
 }
