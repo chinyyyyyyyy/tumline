@@ -1,4 +1,5 @@
 doctype html
+//chatpage
 html(lang='en')
   head
     // Required meta tags
@@ -43,25 +44,27 @@ html(lang='en')
                         .col.col-lg-4
                           img(src='/images/business-and-finance.png', style='width: 5vw')
                         h2(style='align-self: center') #{row.group_name}
-            #chat.col.col-lg-8(style='background: transparent')
+            #chat.col.col-lg-7(style='background: transparent')
               #profileheader.border
                 h1 #{thischat.group_name}
-                .btn-group
-                  button#more.btn(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-                    img(src='/images/more.png', width='30', height='30')
-                  .dropdown-menu.dropdown-menu-right(style='margin-top: 5px;')
-                    form(name='leaves', method='post', action='/leaves')
-                      input(type='hidden', name='chatroomid', value=thischat._id)
-                      button.dropdown-item(type='submit', role='button') Leave group
-                    form(name='destroy', method='post', action='/destroy')
-                      input(type='hidden', name='chatroomid', value=thischat._id)
-                      button.dropdown-item(type='submit', role='button') Delete group
+                .btn-group(style="align-self: center;")
+                  //- button#more.btn(type='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
+                  //-   img(src='/images/more.png', width='30', height='30')
+                  //- .dropdown-menu.dropdown-menu-right(style='margin-top: 5px;')
+                  form(name='leaves', method='post', action='/leaves')
+                    input(type='hidden', name='chatroomid', value=thischat._id)
+                    button.btn.btn-outline-warning(type='submit', role='button') Leave group
+                  form(name='destroy', method='post', action='/destroy')
+                    input(type='hidden', name='chatroomid', value=thischat._id)
+                    button.btn.btn-outline-danger(type='submit', role='button') Delete group
               ul#chatfield.col
                 each row in thischat.group_chat
                     - if(row.User == clientname){
-                        li(class="message-my") #{row.Text}
-                    -}else{
-                        li(class="message-other") #{row.User} : #{row.Text}
+                        //.chatbox-me
+                        li(class="message-my text-break") #{row.Text}
+                    -}else if(row.Text != no){
+                        //.chatbox-other
+                        li(class="message-other text-break") #{row.User} : #{row.Text}
                     -}
               form#chat-form(action="")
                 .input-group.border
@@ -108,11 +111,11 @@ html(lang='en')
         socket.on('chat', function(data) {
             if (data.username == clientname) {
                 // ถ้าเราเป็นคนส่งเอง ให้พ่น li.message.message--me
-                chatHistory.append($('<li class="message-my">').text(data.message));
+                chatHistory.append($('<li class="message-my text-break">').text(data.message));
             } else {
                 // แต่ถ้าเป็นคนอื่นส่ง ให้พ่น li.message เฉยๆ
-                chatHistory.append($('<li class="message-other">').text(data.username + ': ' + data.message));
+                chatHistory.append($('<li class="message-other text-break">').text(data.username + ': ' + data.message));
             }
             // เมื่อพ่นข้อความแล้ว ก็ให้เลื่อนหน้าจอไปที่ข้อความล่าสุดด้วย
-            //chatHistory[0].scrollTop = chatHistory[0].scrollHeight;
+            chatHistory[0].scrollTop = chatHistory[0].scrollHeight;
         });
